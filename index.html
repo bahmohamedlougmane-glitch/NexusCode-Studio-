@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NexusCode - Éditeur Intelligent</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .glass { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); }
+        body { background-color: #020617; color: white; font-family: sans-serif; }
+        #companion-bubble { transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+    </style>
+</head>
+<body class="h-screen flex flex-col overflow-hidden">
+
+    <nav class="h-16 glass flex items-center justify-between px-6 border-b border-white/10">
+        <div class="flex items-center gap-4">
+            <img src="logo.png" alt="NexusCode" class="h-10 w-10 object-contain rounded-lg shadow-lg shadow-blue-500/20">
+            <div class="flex flex-col">
+                <span class="text-xl font-black tracking-tighter text-white">NEXUS<span class="text-blue-500">CODE</span></span>
+                <span class="text-[9px] uppercase tracking-widest text-blue-400 font-bold">Éditeur Intelligent</span>
+            </div>
+        </div>
+        <div class="flex items-center gap-6">
+            <div id="status-ia" class="hidden md:flex flex-col items-end">
+                <span class="text-[10px] text-slate-500 uppercase tracking-tighter">Compagnon Actif</span>
+                <span class="text-[10px] text-green-400 flex items-center gap-1">
+                    <span class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span> Mode Conseil
+                </span>
+            </div>
+            <button class="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-xs font-bold transition-all shadow-lg shadow-blue-900/40">Connexion</button>
+        </div>
+    </nav>
+
+    <main class="flex-1 flex overflow-hidden">
+        <textarea id="editor" class="flex-1 bg-transparent p-8 text-lg outline-none resize-none font-mono text-slate-300 placeholder:text-slate-700" placeholder="Commence à coder ici ton futur..."></textarea>
+    </main>
+
+    <div id="companion-bubble" class="fixed bottom-8 right-8 w-72 glass p-4 rounded-2xl border border-white/10 shadow-2xl translate-y-20 opacity-0 pointer-events-none">
+        <div class="flex items-center gap-3 mb-2">
+            <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-lg">🤖</div>
+            <span class="font-bold text-sm text-blue-400">Nexus IA</span>
+        </div>
+        <p id="ia-message" class="text-xs text-slate-200 leading-relaxed">...</p>
+    </div>
+
+    <script>
+        const editor = document.getElementById('editor');
+        const bubble = document.getElementById('companion-bubble');
+        const iaMessage = document.getElementById('ia-message');
+
+        // Liste des conseils et encouragements
+        const messages = [
+            "Ton code commence à avoir de l'allure !",
+            "N'oublie pas de sauvegarder souvent sur GitHub.",
+            "Et si on ajoutait une petite animation pour rendre ça plus vivant ?",
+            "Tu travailles dur... bois un peu d'eau !",
+            "Si tu bloques, essaye de diviser le problème en deux.",
+            "NexusCode est fier de tes progrès aujourd'hui."
+        ];
+
+        // Fonction pour afficher l'IA
+        function showIAMessage(text) {
+            iaMessage.innerText = text;
+            bubble.classList.remove('translate-y-20', 'opacity-0', 'pointer-events-none');
+            
+            setTimeout(() => {
+                bubble.classList.add('translate-y-20', 'opacity-0', 'pointer-events-none');
+            }, 6000);
+        }
+
+        // Déclencher un message aléatoire toutes les 3 minutes
+        setInterval(() => {
+            const randomMsg = messages[Math.floor(Math.random() * messages.length)];
+            showIAMessage(randomMsg);
+        }, 180000);
+
+        // Premier message de bienvenue après 3 secondes
+        setTimeout(() => {
+            showIAMessage("Bienvenue sur ton NexusCode ! Je suis ton compagnon de route. Prêt à créer ?");
+        }, 3000);
+
+        // Détection de fatigue (si on tape plus de 1000 caractères)
+        editor.addEventListener('input', () => {
+            if(editor.value.length === 500) {
+                showIAMessage("Déjà 500 caractères ! On fait une pause de 30 secondes pour tes yeux ?");
+            }
+        });
+    </script>
+</body>
+</html>
