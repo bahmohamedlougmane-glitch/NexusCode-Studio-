@@ -3,89 +3,139 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NexusCode - Éditeur Intelligent</title>
+    <title>NexusCode v2.0 - IA & Édition</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        .glass { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); }
-        body { background-color: #020617; color: white; font-family: sans-serif; }
-        #companion-bubble { transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+        /* Styles personnalisés pour ton HP EliteBook */
+        .glass { background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(15px); }
+        body { background-color: #020617; color: white; font-family: 'Segoe UI', system-ui, sans-serif; overflow: hidden; }
+        .hidden-app { display: none; }
+        #editor { caret-color: #3b82f6; line-height: 1.6; }
+        .auth-card { animation: fadeIn 0.8s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
-<body class="h-screen flex flex-col overflow-hidden">
+<body class="h-screen flex flex-col">
 
-    <nav class="h-16 glass flex items-center justify-between px-6 border-b border-white/10">
-        <div class="flex items-center gap-4">
-            <img src="logo.png" alt="NexusCode" class="h-10 w-10 object-contain rounded-lg shadow-lg shadow-blue-500/20">
-            <div class="flex flex-col">
-                <span class="text-xl font-black tracking-tighter text-white">NEXUS<span class="text-blue-500">CODE</span></span>
-                <span class="text-[9px] uppercase tracking-widest text-blue-400 font-bold">Éditeur Intelligent</span>
+    <div id="auth-screen" class="fixed inset-0 z-[100] flex items-center justify-center bg-[#020617]">
+        <div class="auth-card w-full max-w-md p-10 rounded-[2.5rem] border border-white/10 glass shadow-2xl text-center">
+            <div class="mb-6 relative">
+                <img src="logo.png" alt="Nexus" class="h-24 w-24 mx-auto rounded-2xl drop-shadow-[0_0_20px_rgba(59,130,246,0.4)]">
+                <div class="absolute -bottom-2 right-1/2 translate-x-12 bg-blue-600 text-[10px] font-bold px-2 py-0.5 rounded-full border-2 border-[#020617]">V2.0</div>
             </div>
-        </div>
-        <div class="flex items-center gap-6">
-            <div id="status-ia" class="hidden md:flex flex-col items-end">
-                <span class="text-[10px] text-slate-500 uppercase tracking-tighter">Compagnon Actif</span>
-                <span class="text-[10px] text-green-400 flex items-center gap-1">
-                    <span class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span> Mode Conseil
-                </span>
+            
+            <h1 class="text-3xl font-black mb-2 tracking-tighter uppercase">NEXUS<span class="text-blue-500">CODE</span></h1>
+            <p class="text-slate-400 text-sm mb-10">Accédez à votre environnement de développement intelligent.</p>
+            
+            <div class="space-y-4">
+                <input type="text" id="user-name" placeholder="Nom d'utilisateur" class="w-full bg-slate-900/50 border border-white/10 rounded-2xl px-5 py-4 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all">
+                <button onclick="startApp()" class="w-full bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 py-4 rounded-2xl font-bold text-sm shadow-xl shadow-blue-900/30 transition-all transform hover:scale-[1.02] active:scale-95">
+                    Activer l'Édition IA
+                </button>
             </div>
-            <button class="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-xs font-bold transition-all shadow-lg shadow-blue-900/40">Connexion</button>
+            <p class="mt-8 text-[9px] text-slate-600 uppercase tracking-[0.2em]">Sécurisé par Nexus-Dev System</p>
         </div>
-    </nav>
+    </div>
 
-    <main class="flex-1 flex overflow-hidden">
-        <textarea id="editor" class="flex-1 bg-transparent p-8 text-lg outline-none resize-none font-mono text-slate-300 placeholder:text-slate-700" placeholder="Commence à coder ici ton futur..."></textarea>
-    </main>
+    <div id="main-app" class="h-screen flex flex-col hidden-app">
+        <nav class="h-16 glass flex items-center justify-between px-8 border-b border-white/5 z-50">
+            <div class="flex items-center gap-4">
+                <img src="logo.png" alt="Logo" class="h-8 w-8 rounded-lg">
+                <div class="flex flex-col">
+                    <span class="text-sm font-bold tracking-tight">NEXUS<span class="text-blue-500">CODE</span></span>
+                    <span class="text-[8px] text-blue-400 uppercase font-black tracking-widest">Studio</span>
+                </div>
+            </div>
+            <div class="flex items-center gap-6">
+                <div class="flex flex-col items-end">
+                    <span id="ia-status-text" class="text-[10px] text-green-400 font-bold flex items-center gap-2 uppercase tracking-tighter">
+                        <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span> IA Opérationnelle
+                    </span>
+                </div>
+                <button onclick="location.reload()" class="p-2 hover:bg-white/5 rounded-full transition-colors text-slate-400 hover:text-white">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
+                </button>
+            </div>
+        </nav>
 
-    <div id="companion-bubble" class="fixed bottom-8 right-8 w-72 glass p-4 rounded-2xl border border-white/10 shadow-2xl translate-y-20 opacity-0 pointer-events-none">
-        <div class="flex items-center gap-3 mb-2">
-            <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-lg">🤖</div>
-            <span class="font-bold text-sm text-blue-400">Nexus IA</span>
+        <main class="flex-1 flex overflow-hidden">
+            <textarea id="editor" 
+                class="flex-1 bg-transparent p-12 text-lg outline-none resize-none font-mono text-slate-300 placeholder:text-slate-800" 
+                placeholder="Écrivez votre code ici... L'IA l'analysera en temps réel."></textarea>
+        </main>
+
+        <div id="companion-bubble" class="fixed bottom-10 right-10 w-80 glass p-6 rounded-[2rem] border border-white/10 shadow-2xl translate-y-32 opacity-0 pointer-events-none transition-all duration-700 z-50">
+            <div class="flex items-center gap-4 mb-3">
+                <div class="w-10 h-10 bg-gradient-to-tr from-blue-600 to-indigo-600 rounded-full flex items-center justify-center shadow-lg shadow-blue-500/20 text-xl">🤖</div>
+                <div>
+                    <h4 class="text-xs font-black text-blue-400 uppercase tracking-widest">Nexus IA</h4>
+                    <p class="text-[10px] text-slate-500">Analyse en cours</p>
+                </div>
+            </div>
+            <p id="ia-message" class="text-xs text-slate-200 leading-relaxed font-medium italic"></p>
         </div>
-        <p id="ia-message" class="text-xs text-slate-200 leading-relaxed">...</p>
     </div>
 
     <script>
+        const authScreen = document.getElementById('auth-screen');
+        const mainApp = document.getElementById('main-app');
         const editor = document.getElementById('editor');
         const bubble = document.getElementById('companion-bubble');
         const iaMessage = document.getElementById('ia-message');
+        const userNameInput = document.getElementById('user-name');
 
-        // Liste des conseils et encouragements
-        const messages = [
-            "Ton code commence à avoir de l'allure !",
-            "N'oublie pas de sauvegarder souvent sur GitHub.",
-            "Et si on ajoutait une petite animation pour rendre ça plus vivant ?",
-            "Tu travailles dur... bois un peu d'eau !",
-            "Si tu bloques, essaye de diviser le problème en deux.",
-            "NexusCode est fier de tes progrès aujourd'hui."
-        ];
-
-        // Fonction pour afficher l'IA
-        function showIAMessage(text) {
-            iaMessage.innerText = text;
-            bubble.classList.remove('translate-y-20', 'opacity-0', 'pointer-events-none');
+        // Fonction pour démarrer l'application
+        function startApp() {
+            const name = userNameInput.value || "Développeur";
+            authScreen.style.opacity = '0';
+            authScreen.style.transform = 'scale(1.05)';
             
             setTimeout(() => {
-                bubble.classList.add('translate-y-20', 'opacity-0', 'pointer-events-none');
-            }, 6000);
+                authScreen.style.display = 'none';
+                mainApp.classList.remove('hidden-app');
+                showIA(`Initialisation terminée. Bienvenue sur NexusCode, <b>${name}</b>. Je surveille vos erreurs.`);
+            }, 600);
         }
 
-        // Déclencher un message aléatoire toutes les 3 minutes
-        setInterval(() => {
-            const randomMsg = messages[Math.floor(Math.random() * messages.length)];
-            showIAMessage(randomMsg);
-        }, 180000);
+        // Système d'affichage de l'IA
+        function showIA(text, duration = 6000) {
+            iaMessage.innerHTML = text;
+            bubble.classList.remove('translate-y-32', 'opacity-0', 'pointer-events-none');
+            
+            setTimeout(() => {
+                bubble.classList.add('translate-y-32', 'opacity-0', 'pointer-events-none');
+            }, duration);
+        }
 
-        // Premier message de bienvenue après 3 secondes
-        setTimeout(() => {
-            showIAMessage("Bienvenue sur ton NexusCode ! Je suis ton compagnon de route. Prêt à créer ?");
-        }, 3000);
-
-        // Détection de fatigue (si on tape plus de 1000 caractères)
+        // ANALYSE DU CODE EN TEMPS RÉEL
         editor.addEventListener('input', () => {
-            if(editor.value.length === 500) {
-                showIAMessage("Déjà 500 caractères ! On fait une pause de 30 secondes pour tes yeux ?");
+            const content = editor.value;
+            
+            // Détection de balise orpheline
+            if (content.includes('<div') && !content.includes('</div>')) {
+                showIA("Analyse : Vous avez ouvert un <b>&lt;div&gt;</b>. N'oubliez pas de le fermer.", 3000);
+            }
+
+            // Détection de ponctuation manquante en CSS
+            if (content.includes('{') && content.includes(':') && !content.includes(';')) {
+                showIA("Conseil : Pensez au point-virgule <b>(;)</b> à la fin de vos propriétés.", 4000);
+            }
+
+            // Félicitations
+            if (content.length === 300) {
+                showIA("Excellent travail ! Votre structure de code est de plus en plus complexe.", 5000);
             }
         });
+
+        // Alerte santé (Sédentarité)
+        let lastAction = Date.now();
+        editor.addEventListener('keydown', () => lastAction = Date.now());
+        
+        setInterval(() => {
+            if (Date.now() - lastAction > 600000) { // 10 minutes d'inactivité
+                showIA("Toujours là ? Une petite pause café ferait du bien à vos yeux.");
+            }
+        }, 300000);
     </script>
 </body>
 </html>
