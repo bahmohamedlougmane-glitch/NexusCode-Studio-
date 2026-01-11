@@ -3,71 +3,75 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NexusCode - Studio Pro</title>
+    <title>NexusCode Studio Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Fira+Code&display=swap" rel="stylesheet">
     <style>
         body { background-color: #0d0d12; color: #e2e8f0; font-family: 'Inter', sans-serif; height: 100vh; overflow: hidden; }
         .sidebar { width: 240px; background: #16161e; border-right: 1px solid #23232f; }
         .ia-panel { width: 320px; background: #16161e; border-left: 1px solid #23232f; }
-        #editor { font-family: 'Fira Code', monospace; background: transparent; color: #cbd5e1; resize: none; outline: none; }
-        .file-item { padding: 8px 12px; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 8px; border-radius: 6px; margin: 2px 8px; }
+        #editor { font-family: 'Fira Code', monospace; background: transparent; color: #cbd5e1; resize: none; outline: none; border: none; width: 100%; height: 100%; }
+        .file-item { padding: 8px 12px; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 8px; border-radius: 6px; margin: 2px 8px; color: #94a3b8; }
         .file-active { background: rgba(59, 130, 246, 0.1); color: #60a5fa; border-left: 2px solid #3b82f6; }
-        
-        /* Style de la fenêtre d'aperçu (Pop-up) */
-        #preview-modal { display: none; position: fixed; inset: 0; z-index: 100; background: rgba(0,0,0,0.8); backdrop-filter: blur(4px); align-items: center; justify-content: center; }
-        .modal-content { background: white; width: 90%; height: 85%; border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); }
+        #preview-modal { display: none; position: fixed; inset: 0; z-index: 100; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); items-center; justify-content: center; padding: 40px; }
+        .modal-content { background: white; width: 100%; height: 100%; border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; }
     </style>
 </head>
 <body class="flex flex-col">
 
     <nav class="h-12 border-b border-white/5 flex items-center justify-between px-4 bg-[#16161e]">
         <div class="flex items-center gap-2">
-            <div class="w-6 h-6 bg-gradient-to-br from-pink-500 to-purple-600 rounded flex items-center justify-center text-[10px] font-black">NC</div>
-            <span class="text-xs font-black uppercase tracking-tighter">NexusCode Studio</span>
+            <div class="w-6 h-6 bg-gradient-to-br from-blue-600 to-purple-600 rounded flex items-center justify-center text-[10px] font-black italic">NC</div>
+            <span class="text-xs font-black uppercase tracking-tighter">NexusCode <span class="text-slate-500 font-medium">Studio</span></span>
         </div>
         <div class="flex items-center gap-3">
             <button onclick="openPreview()" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-1.5 rounded-lg text-[11px] font-bold flex items-center gap-2 transition-all shadow-lg shadow-blue-500/20">
                 👁️ VOIR LE RENDU
             </button>
-            <button onclick="downloadProject()" class="bg-white/5 text-slate-300 border border-white/10 px-3 py-1.5 rounded-lg text-[11px] font-bold">💾 EXPORT</button>
+            <button onclick="downloadProject()" class="bg-white/5 text-slate-300 border border-white/10 px-3 py-1.5 rounded-lg text-[11px] font-bold hover:bg-white/10">💾 EXPORT</button>
         </div>
     </nav>
 
     <div class="flex-1 flex overflow-hidden">
         <aside class="sidebar flex flex-col">
-            <div class="p-4 text-[10px] uppercase tracking-widest font-black text-slate-600 italic">Explorateur</div>
+            <div class="p-4 text-[10px] uppercase tracking-widest font-black text-slate-600">Projet</div>
             <div id="file-list" class="flex-1">
-                <div class="file-item file-active" onclick="switchFile('index.html', this)"><span><></span> index.html</div>
-                <div class="file-item" onclick="switchFile('style.css', this)"><span>#</span> style.css</div>
-                <div class="file-item" onclick="switchFile('main.js', this)"><span>JS</span> main.js</div>
+                <div id="item-index" class="file-item file-active" onclick="switchFile('index.html', this)"><span><></span> index.html</div>
+                <div id="item-style" class="file-item" onclick="switchFile('style.css', this)"><span>#</span> style.css</div>
+                <div id="item-main" class="file-item" onclick="switchFile('main.js', this)"><span>JS</span> main.js</div>
             </div>
         </aside>
 
-        <main class="flex-1 flex flex-col">
+        <main class="flex-1 flex flex-col bg-[#0d0d12]">
             <div class="h-10 bg-[#1e1e2e]/50 flex items-center px-4 border-b border-white/5">
                 <span id="current-filename" class="text-[10px] text-blue-400 font-bold uppercase tracking-widest">index.html</span>
             </div>
-            <textarea id="editor" class="flex-1 p-8 text-sm leading-relaxed" spellcheck="false"></textarea>
+            <div class="flex-1 p-6 overflow-hidden">
+                <textarea id="editor" spellcheck="false"></textarea>
+            </div>
         </main>
 
         <aside class="ia-panel flex flex-col">
             <div class="p-4 border-b border-white/5 flex items-center gap-2">
                 <span class="text-purple-500 animate-pulse">✨</span>
-                <span class="font-bold text-xs">Assistant Nexus</span>
+                <span class="font-bold text-xs uppercase tracking-tighter text-slate-300">Nexus Assistant</span>
             </div>
-            <div id="ia-chat-box" class="flex-1 overflow-y-auto px-4 py-4 text-[12px] space-y-4"></div>
+            <div id="ia-chat-box" class="flex-1 overflow-y-auto px-4 py-4 text-[11px] space-y-4">
+                <div class="bg-[#0d0d12] border border-white/5 p-3 rounded-lg text-slate-400">
+                    Bonjour Lougmane. Je suis prêt à analyser votre code.
+                </div>
+            </div>
             <div class="p-4 bg-[#16161e] border-t border-white/5">
-                <input type="text" id="user-input" placeholder="Une question ?" class="w-full bg-[#0d0d12] border border-white/10 rounded-xl p-3 text-[11px] outline-none">
+                <input type="text" id="user-input" onkeypress="if(event.key==='Enter')sendMessage()" placeholder="Poser une question..." class="w-full bg-[#0d0d12] border border-white/10 rounded-xl p-3 text-[11px] outline-none focus:border-blue-500/50 transition-all">
             </div>
         </aside>
     </div>
 
-    <div id="preview-modal">
-        <div class="modal-content">
-            <div class="bg-gray-100 px-4 py-2 border-b flex justify-between items-center">
-                <span class="text-xs font-bold text-gray-700">Aperçu du projet - Mode Direct</span>
-                <button onclick="closePreview()" class="text-gray-500 hover:text-red-500 font-bold text-lg">&times;</button>
+    <div id="preview-modal" onclick="if(event.target==this)closePreview()">
+        <div class="modal-content animate-in fade-in zoom-in duration-300">
+            <div class="bg-gray-100 px-4 py-2 border-b flex justify-between items-center text-gray-800">
+                <span class="text-[10px] font-bold uppercase tracking-widest">Rendu en direct</span>
+                <button onclick="closePreview()" class="hover:text-red-600 transition-colors font-bold">FERMER (X)</button>
             </div>
             <iframe id="preview-frame" class="flex-1 w-full bg-white"></iframe>
         </div>
