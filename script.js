@@ -1,68 +1,63 @@
-// Base de données des fichiers du Studio
 const files = {
-    'main.js': '// JavaScript\nconsole.log("NexusCode Online");',
-    'script.py': '# Python Mode\ndef nexus():\n    print("Hello from Python")\n\nnexus()',
-    'style.css': '/* Styles */\nbody {\n  background: #0d0d12;\n}',
-    'index.html': '\n<h1>Nexus Studio</h1>'
+    'index.html': '<h1>Bienvenue sur NexusCode</h1>\n<p>Ceci est un rendu en direct.</p>\n<button id="btn">Clique moi</button>',
+    'style.css': 'body { font-family: sans-serif; text-align: center; padding-top: 50px; }\nh1 { color: #8b5cf6; }\nbutton { background: #3b82f6; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; }',
+    'main.js': 'document.getElementById("btn").onclick = () => {\n  alert("Le JavaScript fonctionne !");\n};'
 };
 
-let currentFile = 'main.js';
+let currentFile = 'index.html';
 const editor = document.getElementById('editor');
 
-// Initialisation au chargement
 window.onload = () => {
     editor.value = files[currentFile];
-    addMessage("🤖 **Système :** Bienvenue dans votre Studio Pro. Tout est prêt.");
+    addMessage("🤖 **Nexus :** Studio prêt. Cliquez sur 'Voir le Rendu' pour tester votre code.");
 };
 
-// Navigation entre les fichiers
 function switchFile(filename, element) {
-    files[currentFile] = editor.value; // Sauvegarder le fichier actuel
+    files[currentFile] = editor.value;
     currentFile = filename;
     editor.value = files[currentFile];
     document.getElementById('current-filename').innerText = filename;
-    
     document.querySelectorAll('.file-item').forEach(item => item.classList.remove('file-active'));
     element.classList.add('file-active');
-    addMessage(`📁 Ouverture de <b>${filename}</b>`);
 }
 
-// Actions de l'IA
-function askIA(action) {
-    const responses = {
-        'expliquer': `🔬 Analyse de <b>${currentFile}</b> : Votre structure est propre et optimisée.`,
-        'deboguer': `✅ Debug : Aucune erreur détectée dans <b>${currentFile}</b>.`
-    };
-    addMessage(responses[action]);
+function openPreview() {
+    files[currentFile] = editor.value; // Sync
+    const modal = document.getElementById('preview-modal');
+    const frame = document.getElementById('preview-frame');
+    
+    // Construction du document final
+    const finalHTML = `
+        <html>
+            <head><style>${files['style.css']}</style></head>
+            <body>
+                ${files['index.html']}
+                <script>${files['main.js']}<\/script>
+            </body>
+        </html>
+    `;
+    
+    const blob = new Blob([finalHTML], {type: 'text/html'});
+    frame.src = URL.createObjectURL(blob);
+    modal.style.display = 'flex';
+}
+
+function closePreview() {
+    document.getElementById('preview-modal').style.display = 'none';
 }
 
 function addMessage(text) {
     const chatBox = document.getElementById('ia-chat-box');
     const div = document.createElement('div');
-    div.className = 'chat-bubble';
-    div.innerHTML = text;
+    div.innerHTML = `<div style="background: #0d0d12; border: 1px solid #23232f; border-radius: 8px; padding: 10px; margin-bottom: 10px;">${text}</div>`;
     chatBox.appendChild(div);
     chatBox.scrollTop = chatBox.scrollHeight;
 }
 
-function sendMessage() {
-    const input = document.getElementById('user-input');
-    if(input.value.trim()) {
-        addMessage(`💬 <b>Toi :</b> ${input.value}`);
-        input.value = "";
-        setTimeout(() => addMessage("🤖 **Nexus :** Je traite votre demande..."), 500);
-    }
-}
-
 function downloadProject() {
-    const element = document.createElement('a');
-    const file = new Blob([editor.value], {type: 'text/plain'});
-    element.href = URL.createObjectURL(file);
-    element.download = currentFile;
-    document.body.appendChild(element);
-    element.click();
-}
-
-function runCode() {
-    alert("Exécution de " + currentFile + " en cours...");
+    const blob = new Blob([editor.value], {type: 'text/plain'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = currentFile;
+    a.click();
 }
