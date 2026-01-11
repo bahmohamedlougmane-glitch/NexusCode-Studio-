@@ -3,175 +3,68 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NexusCode Studio Pro - Export Ready</title>
+    <title>NexusCode Studio Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Fira+Code&display=swap" rel="stylesheet">
-    <style>
+    <link rel="stylesheet" href="style.css"> <style>
         body { background-color: #0d0d12; color: #e2e8f0; font-family: 'Inter', sans-serif; height: 100vh; overflow: hidden; }
         .sidebar { width: 240px; background: #16161e; border-right: 1px solid #23232f; }
-        .main-editor { background: #0d0d12; }
         .ia-panel { width: 320px; background: #16161e; border-left: 1px solid #23232f; }
         .btn-ia { background: #1e1e2e; border: 1px solid #333345; padding: 10px; border-radius: 8px; font-size: 11px; text-align: center; transition: all 0.2s; font-weight: 600; cursor: pointer; }
         .btn-ia:hover { border-color: #8b5cf6; background: #23232f; }
         #editor { font-family: 'Fira Code', monospace; scrollbar-width: thin; scrollbar-color: #23232f transparent; }
         .chat-bubble { background: #0d0d12; border: 1px solid #23232f; border-radius: 12px; padding: 12px; font-size: 12px; margin-bottom: 10px; border-left: 3px solid #8b5cf6; }
-        .status-bar { height: 28px; background: #1e1e2e; border-top: 1px solid #23232f; font-size: 11px; }
-        .file-item { padding: 8px 12px; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 8px; border-radius: 6px; margin: 2px 8px; transition: all 0.2s; }
-        .file-item:hover { background: rgba(255,255,255,0.05); }
+        .file-item { padding: 8px 12px; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 8px; border-radius: 6px; margin: 2px 8px; }
         .file-active { background: rgba(59, 130, 246, 0.1) !important; color: #60a5fa !important; border-left: 2px solid #3b82f6; }
     </style>
 </head>
 <body class="flex flex-col">
 
     <nav class="h-12 border-b border-white/5 flex items-center justify-between px-4 bg-[#16161e]">
-        <div class="flex items-center gap-6">
-            <div class="flex items-center gap-2">
-                <div class="w-6 h-6 bg-gradient-to-br from-purple-600 to-blue-500 rounded flex items-center justify-center text-[10px] font-black italic">NC</div>
-                <span class="text-xs font-black tracking-tighter uppercase">NEXUSCODE <span class="text-slate-500 font-medium tracking-normal">Studio Pro</span></span>
-            </div>
+        <div class="flex items-center gap-2">
+            <div class="w-6 h-6 bg-gradient-to-br from-purple-600 to-blue-500 rounded flex items-center justify-center text-[10px] font-black italic">NC</div>
+            <span class="text-xs font-black tracking-tighter uppercase">NEXUSCODE <span class="text-slate-500 font-medium tracking-normal">Studio Pro</span></span>
         </div>
         <div class="flex items-center gap-3">
-            <button onclick="downloadProject()" class="bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10 px-3 py-1.5 rounded-lg text-[11px] font-bold flex items-center gap-2 transition-all">
-                <span>💾</span> EXPORTER
-            </button>
-            <button onclick="runCode()" class="bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 px-4 py-1.5 rounded-lg text-[11px] font-bold flex items-center gap-2 hover:bg-emerald-600/30 transition-all">
-                <span>▶</span> EXÉCUTER
-            </button>
+            <button onclick="downloadProject()" class="bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10 px-3 py-1.5 rounded-lg text-[11px] font-bold">💾 EXPORTER</button>
+            <button onclick="runCode()" class="bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 px-4 py-1.5 rounded-lg text-[11px] font-bold tracking-widest">▶ EXÉCUTER</button>
         </div>
     </nav>
 
     <div class="flex-1 flex overflow-hidden">
-        
         <aside class="sidebar flex flex-col">
-            <div class="p-4 text-[10px] uppercase tracking-widest font-black text-slate-600">Fichiers du Projet</div>
-            <div id="file-list" class="flex-1 overflow-y-auto">
+            <div class="p-4 text-[10px] uppercase tracking-widest font-black text-slate-600">Explorateur</div>
+            <div id="file-list" class="flex-1">
                 <div class="file-item file-active" onclick="switchFile('main.js', this)"><span>JS</span> main.js</div>
+                <div class="file-item" onclick="switchFile('script.py', this)"><span>PY</span> script.py</div>
                 <div class="file-item" onclick="switchFile('style.css', this)"><span>#</span> style.css</div>
                 <div class="file-item" onclick="switchFile('index.html', this)"><span><></span> index.html</div>
             </div>
-            <div class="p-4 border-t border-white/5 text-[9px] text-slate-600 text-center">
-                Sauvegarde auto active
-            </div>
         </aside>
 
-        <main class="flex-1 flex flex-col main-editor">
-            <div class="h-10 bg-[#1e1e2e]/50 flex items-center px-4 border-b border-white/5 justify-between">
+        <main class="flex-1 flex flex-col">
+            <div class="h-10 bg-[#1e1e2e]/50 flex items-center px-4 border-b border-white/5">
                 <span id="current-filename" class="text-[10px] text-blue-400 font-bold uppercase tracking-widest">main.js</span>
-                <span class="text-[9px] text-slate-600 font-mono">UTF-8</span>
             </div>
             <textarea id="editor" class="flex-1 bg-transparent p-8 outline-none text-sm leading-relaxed text-slate-300 resize-none" spellcheck="false"></textarea>
         </main>
 
         <aside class="ia-panel flex flex-col">
-            <div class="p-4 border-b border-white/5 flex items-center justify-between">
-                <div class="flex items-center gap-2">
-                    <span class="text-purple-500 animate-pulse">✨</span>
-                    <span class="font-bold text-xs uppercase tracking-tighter">Nexus Assistant</span>
-                </div>
+            <div class="p-4 border-b border-white/5 flex items-center gap-2">
+                <span class="text-purple-500 animate-pulse">✨</span>
+                <span class="font-bold text-xs uppercase tracking-tighter">Nexus Assistant</span>
             </div>
-            
             <div class="p-4 grid grid-cols-2 gap-2 border-b border-white/5">
                 <button onclick="askIA('expliquer')" class="btn-ia">Expliquer</button>
-                <button onclick="askIA('optimiser')" class="btn-ia">Optimiser</button>
                 <button onclick="askIA('deboguer')" class="btn-ia">Déboguer</button>
-                <button onclick="askIA('documenter')" class="btn-ia">Documenter</button>
             </div>
-
-            <div id="ia-chat-box" class="flex-1 overflow-y-auto px-4 py-4 space-y-4">
-                <div class="chat-bubble">Projet chargé. Je suis prêt à t'aider à coder ton application.</div>
-            </div>
-
+            <div id="ia-chat-box" class="flex-1 overflow-y-auto px-4 py-4"></div>
             <div class="p-4 bg-[#16161e] border-t border-white/5">
-                <input type="text" id="user-input" onkeypress="if(event.key==='Enter')sendMessage()" placeholder="Poser une question à l'IA..." class="w-full bg-[#0d0d12] border border-white/10 rounded-xl p-3 text-[11px] outline-none focus:border-purple-500/50 transition-all">
+                <input type="text" id="user-input" onkeypress="if(event.key==='Enter')sendMessage()" placeholder="Message à l'IA..." class="w-full bg-[#0d0d12] border border-white/10 rounded-xl p-3 text-[11px] outline-none focus:border-purple-500/50">
             </div>
         </aside>
     </div>
 
-    <footer class="status-bar flex items-center justify-between px-3 text-slate-500">
-        <div class="flex items-center gap-4">
-            <span class="flex items-center gap-1">🌿 branch: <b class="text-slate-300">main</b></span>
-        </div>
-        <div class="flex items-center gap-4 italic">
-            <span>By Lougmane</span>
-            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-        </div>
-    </footer>
-
-    <script>
-        const files = {
-            'main.js': '// Logique de l\'application\nconsole.log("NexusCode Studio Pro Ready");',
-            'style.css': '/* Design du projet */\nbody {\n  margin: 0;\n  background: #000;\n}',
-            'index.html': '<!DOCTYPE html>\n<html>\n<body>\n  <h1>Nexus App</h1>\n</body>\n</html>'
-        };
-
-        let currentFile = 'main.js';
-        const editor = document.getElementById('editor');
-
-        // Initialisation
-        editor.value = files[currentFile];
-
-        function switchFile(filename, element) {
-            files[currentFile] = editor.value; // Sauvegarde l'ancien
-            currentFile = filename;
-            editor.value = files[currentFile];
-            document.getElementById('current-filename').innerText = filename;
-            
-            document.querySelectorAll('.file-item').forEach(item => item.classList.remove('file-active'));
-            element.classList.add('file-active');
-            addMessage(`📁 Switch vers <b>${filename}</b>`);
-        }
-
-        function downloadProject() {
-            files[currentFile] = editor.value; // Sync avant export
-            
-            // On télécharge le fichier actuel
-            const element = document.createElement('a');
-            const fileContent = files[currentFile];
-            const file = new Blob([fileContent], {type: 'text/plain'});
-            element.href = URL.createObjectURL(file);
-            element.download = currentFile;
-            document.body.appendChild(element);
-            element.click();
-            
-            addMessage("💾 **Succès :** Le fichier <b>" + currentFile + "</b> a été exporté vers ton PC.");
-        }
-
-        function askIA(action) {
-            const responses = {
-                'expliquer': "🔬 Analyse de <b>"+currentFile+"</b> : Ta structure est propre et respecte les standards de 2026.",
-                'optimiser': "⚡ Optimisation : Pense à compresser tes ressources pour un chargement plus rapide.",
-                'deboguer': "✅ Debug : Aucune erreur de syntaxe détectée dans ce fichier.",
-                'documenter': "📝 Documentation : J'ai ajouté des balises de commentaires virtuelles."
-            };
-            addMessage(responses[action]);
-        }
-
-        function addMessage(text) {
-            const chatBox = document.getElementById('ia-chat-box');
-            const div = document.createElement('div');
-            div.className = 'chat-bubble';
-            div.innerHTML = text;
-            chatBox.appendChild(div);
-            chatBox.scrollTop = chatBox.scrollHeight;
-        }
-
-        function sendMessage() {
-            const input = document.getElementById('user-input');
-            if(input.value.trim()) {
-                addMessage(`💬 <b>Toi :</b> ${input.value}`);
-                const q = input.value.toLowerCase();
-                input.value = "";
-                setTimeout(() => {
-                    let r = "Je comprends. Je vais analyser cela dans le contexte de ton projet.";
-                    if(q.includes("aide")) r = "Je suis là ! Utilise les boutons du haut pour des actions rapides.";
-                    addMessage(`🤖 <b>Nexus :</b> ${r}`);
-                }, 600);
-            }
-        }
-
-        function runCode() {
-            alert("Exécution de " + currentFile + " terminée.\nRésultat disponible dans la console.");
-        }
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>
