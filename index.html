@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NexusCode Studio Pro - IA Active</title>
+    <title>NexusCode Studio Pro - Multi-Fichiers</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Fira+Code&display=swap" rel="stylesheet">
     <style>
@@ -12,11 +11,14 @@
         .sidebar { width: 240px; background: #16161e; border-right: 1px solid #23232f; }
         .main-editor { background: #0d0d12; }
         .ia-panel { width: 320px; background: #16161e; border-left: 1px solid #23232f; }
-        .btn-ia { background: #1e1e2e; border: 1px solid #333345; padding: 10px; border-radius: 8px; font-size: 11px; text-align: center; transition: all 0.2s; font-weight: 600; }
-        .btn-ia:hover { border-color: #8b5cf6; background: #23232f; transform: translateY(-1px); }
+        .btn-ia { background: #1e1e2e; border: 1px solid #333345; padding: 10px; border-radius: 8px; font-size: 11px; text-align: center; transition: all 0.2s; font-weight: 600; cursor: pointer; }
+        .btn-ia:hover { border-color: #8b5cf6; background: #23232f; }
         #editor { font-family: 'Fira Code', monospace; scrollbar-width: thin; scrollbar-color: #23232f transparent; }
-        .chat-bubble { background: #0d0d12; border: 1px solid #23232f; border-radius: 12px; padding: 12px; font-size: 12px; margin-bottom: 10px; line-height: 1.5; border-left: 3px solid #8b5cf6; }
+        .chat-bubble { background: #0d0d12; border: 1px solid #23232f; border-radius: 12px; padding: 12px; font-size: 12px; margin-bottom: 10px; border-left: 3px solid #8b5cf6; }
         .status-bar { height: 28px; background: #1e1e2e; border-top: 1px solid #23232f; font-size: 11px; }
+        .file-item { padding: 8px 12px; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 8px; border-radius: 6px; margin: 2px 8px; transition: all 0.2s; }
+        .file-item:hover { background: rgba(255,255,255,0.05); }
+        .file-active { background: rgba(59, 130, 246, 0.1) !important; color: #60a5fa !important; border-left: 2px solid #3b82f6; }
     </style>
 </head>
 <body class="flex flex-col">
@@ -25,48 +27,36 @@
         <div class="flex items-center gap-6">
             <div class="flex items-center gap-2">
                 <div class="w-6 h-6 bg-gradient-to-br from-purple-600 to-blue-500 rounded flex items-center justify-center text-[10px] font-black italic">NC</div>
-                <span class="text-xs font-black tracking-tighter">NEXUSCODE <span class="text-slate-500 font-medium tracking-normal">Studio Pro</span></span>
+                <span class="text-xs font-black tracking-tighter">NEXUSCODE <span class="text-slate-500 font-medium">Studio Pro</span></span>
             </div>
         </div>
-        <div class="flex items-center gap-3">
-             <button onclick="runCode()" class="bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 px-4 py-1.5 rounded-lg text-[11px] font-bold flex items-center gap-2 hover:bg-emerald-600/30 transition-all">
-                <span>▶</span> EXÉCUTER
-            </button>
-        </div>
+        <button onclick="runCode()" class="bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 px-4 py-1.5 rounded-lg text-[11px] font-bold flex items-center gap-2 hover:bg-emerald-600/30">
+            <span>▶</span> EXÉCUTER
+        </button>
     </nav>
 
     <div class="flex-1 flex overflow-hidden">
         
-        <aside class="sidebar hidden md:flex flex-col">
+        <aside class="sidebar flex flex-col">
             <div class="p-4 text-[10px] uppercase tracking-widest font-black text-slate-600">Projet</div>
-            <div class="flex-1 overflow-y-auto px-2">
-                <div class="flex items-center gap-2 p-2 text-xs text-slate-400 hover:bg-white/5 rounded cursor-pointer"><span>📁</span> src</div>
-                <div class="flex items-center gap-2 p-2 text-xs text-blue-400 bg-blue-500/5 border-l-2 border-blue-500 rounded ml-4 italic"><span>🔹</span> main.js</div>
-                <div class="flex items-center gap-2 p-2 text-xs text-slate-400 hover:bg-white/5 rounded ml-4"><span>🔹</span> style.css</div>
+            <div id="file-list" class="flex-1 overflow-y-auto">
+                <div class="file-item file-active" onclick="switchFile('main.js', this)"><span>JS</span> main.js</div>
+                <div class="file-item" onclick="switchFile('style.css', this)"><span>#</span> style.css</div>
+                <div class="file-item" onclick="switchFile('index.html', this)"><span><></span> index.html</div>
             </div>
         </aside>
 
         <main class="flex-1 flex flex-col main-editor">
             <div class="h-10 bg-[#1e1e2e]/50 flex items-center px-4 border-b border-white/5">
-                <span class="text-[10px] text-blue-400 border-b-2 border-blue-500 h-full flex items-center px-3 font-bold">main.js</span>
+                <span id="current-filename" class="text-[10px] text-blue-400 font-bold uppercase tracking-widest">main.js</span>
             </div>
-            <textarea id="editor" class="flex-1 bg-transparent p-8 outline-none text-sm leading-relaxed text-slate-300 resize-none" spellcheck="false" placeholder="// Écris ton code ici...">
-function helloNexus() {
-  console.log("Bienvenue dans le Studio Pro !");
-  let status = "Connecté";
-  return status;
-}
-
-helloNexus();</textarea>
+            <textarea id="editor" class="flex-1 bg-transparent p-8 outline-none text-sm leading-relaxed text-slate-300 resize-none" spellcheck="false"></textarea>
         </main>
 
         <aside class="ia-panel flex flex-col">
-            <div class="p-4 border-b border-white/5 flex items-center justify-between">
-                <div class="flex items-center gap-2">
-                    <span class="text-purple-500 animate-pulse">✨</span>
-                    <span class="font-bold text-xs uppercase tracking-tighter">Nexus Assistant</span>
-                </div>
-                <div class="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
+            <div class="p-4 border-b border-white/5 flex items-center gap-2">
+                <span class="text-purple-500 animate-pulse">✨</span>
+                <span class="font-bold text-xs uppercase tracking-tighter">Nexus Assistant</span>
             </div>
             
             <div class="p-4 grid grid-cols-2 gap-2">
@@ -76,39 +66,66 @@ helloNexus();</textarea>
                 <button onclick="askIA('documenter')" class="btn-ia">Documenter</button>
             </div>
 
-            <div id="ia-chat-box" class="flex-1 overflow-y-auto px-4 py-2 space-y-3">
-                <div class="chat-bubble">
-                    Bonjour ! Je suis prêt à analyser votre code. Choisissez une action ci-dessus ou parlez-moi directement.
-                </div>
+            <div id="ia-chat-box" class="flex-1 overflow-y-auto px-4 py-2">
+                <div class="chat-bubble">Prêt à travailler sur <b id="chat-file-focus">main.js</b>. Que puis-je faire ?</div>
             </div>
 
             <div class="p-4 bg-[#16161e] border-t border-white/5">
-                <div class="relative">
-                    <input type="text" id="user-input" placeholder="Poser une question..." class="w-full bg-[#0d0d12] border border-white/10 rounded-xl p-3 pr-10 text-[11px] outline-none focus:border-purple-500/50 transition-all">
-                    <button onclick="sendMessage()" class="absolute right-2 top-2.5 text-purple-500 hover:text-purple-400">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                    </button>
-                </div>
+                <input type="text" id="user-input" onkeypress="if(event.key==='Enter')sendMessage()" placeholder="Poser une question..." class="w-full bg-[#0d0d12] border border-white/10 rounded-xl p-3 text-[11px] outline-none focus:border-purple-500/50">
             </div>
         </aside>
     </div>
 
-    <footer class="status-bar flex items-center justify-between px-3 text-slate-500 font-medium">
-        <div class="flex items-center gap-4">
-            <span class="flex items-center gap-1"><span class="text-blue-500">🌿</span> main*</span>
-            <span>⟳ 0 △ 1</span>
-        </div>
-        <div class="flex items-center gap-4">
-            <span>JavaScript</span>
-            <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-emerald-500"></span> Studio Lougmane Ready</span>
-        </div>
+    <footer class="status-bar flex items-center justify-between px-3 text-slate-500">
+        <div class="flex items-center gap-4"><span>🌿 main</span><span>UTF-8</span></div>
+        <div class="flex items-center gap-4"><span id="line-count">0 lignes</span><span>Lougmane Studio</span></div>
     </footer>
 
     <script>
-        const chatBox = document.getElementById('ia-chat-box');
+        // Contenu simulé des fichiers
+        const files = {
+            'main.js': 'function accueil() {\n  console.log("NexusCode activé");\n}\n\naccueil();',
+            'style.css': 'body {\n  background: #0d0d12;\n  color: white;\n}\n\n.nexus-button {\n  padding: 10px;\n}',
+            'index.html': '<!DOCTYPE html>\n<html>\n<head>\n  <title>Nouveau Projet</title>\n</head>\n<body>\n  <h1>Hello Nexus</h1>\n</body>\n</html>'
+        };
+
+        let currentFile = 'main.js';
         const editor = document.getElementById('editor');
+        const fileNameDisplay = document.getElementById('current-filename');
+        const chatFileFocus = document.getElementById('chat-file-focus');
+
+        // Charger le fichier initial
+        editor.value = files[currentFile];
+
+        function switchFile(filename, element) {
+            // Sauvegarder le contenu actuel avant de changer
+            files[currentFile] = editor.value;
+            
+            // Changer de fichier
+            currentFile = filename;
+            editor.value = files[currentFile];
+            fileNameDisplay.innerText = filename;
+            chatFileFocus.innerText = filename;
+
+            // Gérer l'apparence de l'explorateur
+            document.querySelectorAll('.file-item').forEach(item => item.classList.remove('file-active'));
+            element.classList.add('file-active');
+
+            addMessage(`📁 Ouverture de <b>${filename}</b> réussie.`);
+        }
+
+        function askIA(action) {
+            const responses = {
+                'expliquer': `🔬 Sur <b>${currentFile}</b> : Votre code semble structuré correctement pour un environnement moderne.`,
+                'optimiser': `⚡ J'ai trouvé 2 points d'optimisation dans <b>${currentFile}</b> pour améliorer la vitesse sur ton EliteBook.`,
+                'deboguer': `✅ Analyse de <b>${currentFile}</b> terminée : 0 erreur critique détectée.`,
+                'documenter': `📝 Documentation JSDoc générée pour les fonctions de <b>${currentFile}</b>.`
+            };
+            addMessage(responses[action]);
+        }
 
         function addMessage(text) {
+            const chatBox = document.getElementById('ia-chat-box');
             const div = document.createElement('div');
             div.className = 'chat-bubble';
             div.innerHTML = text;
@@ -116,46 +133,24 @@ helloNexus();</textarea>
             chatBox.scrollTop = chatBox.scrollHeight;
         }
 
-        function askIA(action) {
-            const code = editor.value;
-            let response = "";
-
-            if (code.trim() === "") {
-                response = "Votre éditeur est vide ! Écrivez du code pour que je puisse l'analyser.";
-            } else {
-                switch(action) {
-                    case 'expliquer':
-                        response = "🔬 **Analyse :** Votre code définit une fonction ou une logique. Je vois " + (code.length) + " caractères. Voulez-vous que j'analyse une ligne précise ?";
-                        break;
-                    case 'optimiser':
-                        response = "⚡ **Optimisation :** J'ai vérifié la syntaxe. Votre code semble correct. Je suggère d'utiliser des constantes `const` si les variables ne changent pas.";
-                        break;
-                    case 'deboguer':
-                        response = code.includes(';') ? "✅ **Debug :** Aucune erreur majeure détectée. N'oubliez pas de tester les cas particuliers !" : "⚠️ **Alerte :** Pensez à vérifier vos points-virgules pour plus de clarté.";
-                        break;
-                    case 'documenter':
-                        response = "📝 **Doc :** J'ai généré des commentaires invisibles pour votre structure. C'est une bonne pratique !";
-                        break;
-                }
-            }
-            addMessage(response);
-        }
-
         function sendMessage() {
             const input = document.getElementById('user-input');
-            if(input.value.trim() !== "") {
-                addMessage("💬 **Vous :** " + input.value);
-                setTimeout(() => {
-                    addMessage("🤖 **Nexus :** Je traite votre demande concernant : '" + input.value + "'.");
-                }, 600);
+            if(input.value.trim()) {
+                addMessage(`💬 <b>Vous :</b> ${input.value}`);
                 input.value = "";
+                setTimeout(() => addMessage(`🤖 <b>Nexus :</b> Analyse en cours sur le fichier ${currentFile}...`), 500);
             }
         }
 
         function runCode() {
-            alert("Exécution en cours...\nRésultat dans la console du studio.");
-            console.log("Nexus Studio - Output:", editor.value);
+            alert(`Lancement du fichier ${currentFile}...\nConsultez la console pour voir le résultat.`);
         }
+
+        // Compteur de lignes simple
+        editor.addEventListener('input', () => {
+            const lines = editor.value.split('\n').length;
+            document.getElementById('line-count').innerText = `${lines} lignes`;
+        });
     </script>
 </body>
 </html>
