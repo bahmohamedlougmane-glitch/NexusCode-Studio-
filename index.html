@@ -2,126 +2,101 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NexusCode v2.5 - Studio Final</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NexusCode - Studio Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        .glass { background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(15px); }
-        body { background-color: #020617; color: white; font-family: 'Segoe UI', system-ui, sans-serif; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
-        .hidden-app { display: none !important; }
-        #editor { font-family: 'Fira Code', monospace; -webkit-overflow-scrolling: touch; }
-        .input-nexus { background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 12px 16px; width: 100%; color: white; font-size: 16px; outline: none; }
-        .input-nexus:focus { border-color: #3b82f6; }
+        body { background-color: #0d0d12; color: #e2e8f0; font-family: 'Inter', sans-serif; height: 100vh; overflow: hidden; }
+        .sidebar { width: 240px; background: #16161e; border-right: 1px solid #23232f; }
+        .main-editor { background: #0d0d12; }
+        .ia-panel { width: 300px; background: #16161e; border-left: 1px solid #23232f; }
+        .status-bar { height: 25px; background: #1e1e2e; border-top: 1px solid #23232f; font-size: 11px; }
+        .file-item { padding: 6px 12px; font-size: 13px; color: #94a3b8; cursor: pointer; display: flex; align-items: center; gap: 8px; }
+        .file-item:hover { background: #1e1e2e; color: white; }
+        .btn-ia { background: #23232f; border: 1px solid #333345; padding: 8px; border-radius: 8px; font-size: 12px; text-align: left; }
     </style>
 </head>
-<body>
+<body class="flex flex-col">
 
-    <div id="auth-screen" class="fixed inset-0 z-[100] flex items-center justify-center bg-[#020617] p-4">
-        <div class="w-full max-w-md p-8 rounded-[2.5rem] border border-white/10 glass shadow-2xl text-center">
-            <img src="logo.png" alt="Nexus" id="main-logo" class="h-16 w-16 mx-auto mb-4 rounded-2xl shadow-lg shadow-blue-500/20">
-            <h1 class="text-2xl font-black tracking-tighter uppercase italic">NEXUS<span class="text-blue-500">CODE</span></h1>
-            <p class="text-slate-400 text-[10px] mb-8 font-bold uppercase tracking-widest">Studio Cloud Gratuit</p>
-            
-            <div class="space-y-3 text-left">
-                <input type="text" id="reg-name" placeholder="Nom complet" class="input-nexus">
-                <input type="email" id="reg-email" placeholder="E-mail" class="input-nexus">
-                <input type="password" id="reg-pass" placeholder="Mot de passe" class="input-nexus">
-                <button onclick="handleSignup()" class="w-full bg-blue-600 hover:bg-blue-500 py-4 rounded-xl font-bold text-sm shadow-xl transition-all active:scale-95 mt-4">
-                    Créer mon compte
-                </button>
-                <div class="text-center mt-4">
-                    <button onclick="resetAccount()" class="text-[9px] text-slate-500 uppercase tracking-widest hover:text-blue-400 transition-colors">Réinscription / Oubli</button>
-                </div>
+    <nav class="h-12 border-b border-white/5 flex items-center justify-between px-4 bg-[#16161e]">
+        <div class="flex items-center gap-6">
+            <div class="flex items-center gap-2">
+                <div class="w-6 h-6 bg-pink-500 rounded flex items-center justify-center text-[10px] font-bold">NC</div>
+                <span class="text-xs font-bold">NexusCode <span class="text-slate-500 font-normal">Studio Pro</span></span>
+            </div>
+            <div class="hidden md:flex gap-4 text-xs text-slate-400">
+                <span>Fichier</span><span>Édition</span><span>Affichage</span><span>Exécuter</span>
             </div>
         </div>
-    </div>
+        <button class="bg-emerald-600/20 text-emerald-500 border border-emerald-500/30 px-3 py-1 rounded text-xs flex items-center gap-2">
+            <span>▶</span> Exécuter
+        </button>
+    </nav>
 
-    <div id="main-app" class="flex-1 flex flex-col hidden-app">
-        <nav class="h-14 glass flex items-center justify-between px-4 sm:px-8 border-b border-white/5">
-            <div class="flex items-center gap-2">
-                <img src="logo.png" class="h-6 w-6 rounded">
-                <span class="text-xs font-black tracking-tighter uppercase">Nexus <span class="text-blue-500">Studio</span></span>
+    <div class="flex-1 flex overflow-hidden">
+        
+        <aside class="sidebar flex flex-col">
+            <div class="p-4 text-[10px] uppercase tracking-widest font-bold text-slate-500">Explorateur</div>
+            <div class="flex-1 overflow-y-auto">
+                <div class="file-item"><span>📁</span> src</div>
+                <div class="file-item ml-4"><span>📂</span> components</div>
+                <div class="file-item ml-8 text-blue-400"><span>🔹</span> Button.tsx</div>
+                <div class="file-item ml-8"><span>🔹</span> Card.tsx</div>
+                <div class="file-item ml-4"><span>📂</span> utils</div>
+                <div class="file-item ml-4"><span>🐍</span> main.py</div>
+                <div class="file-item"><span>📄</span> package.json</div>
             </div>
-            <div class="flex items-center gap-4">
-                <span id="user-display" class="hidden sm:block text-[10px] text-blue-400 font-bold bg-blue-500/10 px-3 py-1 rounded border border-blue-500/20"></span>
-                <button onclick="logout()" class="text-slate-500 hover:text-red-400"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg></button>
-            </div>
-        </nav>
+        </aside>
 
-        <main class="flex-1 relative overflow-hidden flex flex-col">
-            <textarea id="editor" class="flex-1 bg-transparent p-6 text-base outline-none resize-none text-slate-300 font-mono" placeholder="Écrivez votre code ici..."></textarea>
-            
-            <div id="companion-bubble" class="absolute bottom-6 right-6 left-6 sm:left-auto sm:w-72 glass p-4 rounded-xl border border-white/10 shadow-2xl translate-y-40 opacity-0 transition-all duration-500 z-50">
-                <div class="flex items-center gap-2 mb-1">
-                    <div class="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center text-[10px]">🤖</div>
-                    <span class="font-bold text-[9px] text-blue-400 uppercase">Nexus IA</span>
-                </div>
-                <p id="ia-message" class="text-[11px] text-slate-200 italic"></p>
+        <main class="flex-1 flex flex-col main-editor">
+            <div class="h-8 bg-[#1e1e2e] flex items-center px-4 border-b border-white/5">
+                <span class="text-[10px] text-blue-400 border-b border-blue-400 h-full flex items-center px-2">Button.tsx</span>
             </div>
+            <textarea id="editor" class="flex-1 bg-transparent p-6 outline-none font-mono text-sm leading-relaxed" spellcheck="false">
+export const Button = ({ label }) => {
+  return (
+    <button className="bg-blue-500 text-white p-2">
+      {label}
+    </button>
+  );
+};</textarea>
         </main>
+
+        <aside class="ia-panel p-4 flex flex-col gap-4">
+            <div class="flex items-center gap-2 mb-2">
+                <span class="text-purple-500">✨</span>
+                <span class="font-bold text-sm">Assistant IA</span>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-2">
+                <button class="btn-ia hover:border-blue-500">💡 Expliquer</button>
+                <button class="btn-ia hover:border-blue-500"><> Optimiser</button>
+                <button class="btn-ia hover:border-blue-500">🐞 Déboguer</button>
+                <button class="btn-ia hover:border-blue-500">📝 Documenter</button>
+            </div>
+
+            <div class="flex-1 bg-[#0d0d12] rounded-xl p-3 text-xs text-slate-400 border border-white/5 overflow-y-auto mt-4">
+                <p class="mb-2">**Astuce du jour :** Tu peux me parler avec le micro !</p>
+            </div>
+
+            <div class="relative mt-auto">
+                <input type="text" placeholder="Peux-tu m'expliquer ce code..." class="w-full bg-[#23232f] border border-white/10 rounded-lg p-3 pr-10 text-xs outline-none focus:border-purple-500">
+                <button class="absolute right-2 top-2 text-purple-500 italic">▶</button>
+            </div>
+        </aside>
     </div>
 
-    <script>
-        const authScreen = document.getElementById('auth-screen');
-        const mainApp = document.getElementById('main-app');
-        const editor = document.getElementById('editor');
-        const bubble = document.getElementById('companion-bubble');
-        const iaMessage = document.getElementById('ia-message');
+    <footer class="status-bar flex items-center justify-between px-3 text-slate-500">
+        <div class="flex items-center gap-4">
+            <span>🌿 main</span>
+            <span>⟳ 0 △ 0</span>
+        </div>
+        <div class="flex items-center gap-4">
+            <span>UTF-8</span>
+            <span class="text-emerald-500 flex items-center gap-1">● En ligne</span>
+            <span>by Lougmane</span>
+        </div>
+    </footer>
 
-        // Sécurité Logo : Si logo.png n'existe pas, on met un cercle bleu
-        document.getElementById('main-logo').onerror = function() {
-            this.src = "https://ui-avatars.com/api/?name=Nexus&background=3b82f6&color=fff";
-        };
-
-        function handleSignup() {
-            const name = document.getElementById('reg-name').value;
-            const email = document.getElementById('reg-email').value;
-            const pass = document.getElementById('reg-pass').value;
-            if (name.length > 2 && email.includes('@') && pass.length > 5) {
-                const data = { name, email };
-                localStorage.setItem('nexus_user_data', JSON.stringify(data));
-                enterApp(data);
-            } else { alert("Veuillez remplir tous les champs (E-mail valide + Pass 6 car. min)"); }
-        }
-
-        function enterApp(data) {
-            authScreen.classList.add('hidden-app');
-            mainApp.classList.remove('hidden-app');
-            document.getElementById('user-display').innerText = data.email.toUpperCase();
-            showIA(`Identification réussie. Bienvenue, <b>${data.name}</b>.`);
-        }
-
-        function showIA(text) {
-            iaMessage.innerHTML = text;
-            bubble.classList.remove('translate-y-40', 'opacity-0');
-            setTimeout(() => bubble.classList.add('translate-y-40', 'opacity-0'), 5000);
-        }
-
-        function resetAccount() {
-            if(confirm("Supprimer le compte pour en créer un nouveau ?")) {
-                localStorage.clear();
-                location.reload();
-            }
-        }
-
-        function logout() { location.reload(); }
-
-        // Système de sauvegarde automatique
-        window.onload = () => {
-            const saved = localStorage.getItem('nexus_user_data');
-            if (saved) enterApp(JSON.parse(saved));
-            
-            const draft = localStorage.getItem('nexus_draft');
-            if (draft) editor.value = draft;
-        };
-
-        editor.addEventListener('input', () => {
-            localStorage.setItem('nexus_draft', editor.value);
-            // IA : Détecte les balises non fermées
-            if (editor.value.includes('<div') && !editor.value.includes('</div>')) {
-                showIA("Note : N'oubliez pas de fermer votre balise &lt;div&gt;.");
-            }
-        });
-    </script>
 </body>
 </html>
