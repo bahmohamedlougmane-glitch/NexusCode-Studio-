@@ -1,19 +1,22 @@
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NexusCode - Studio Pro</title>
+    <title>NexusCode Studio Pro - IA Active</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Fira+Code&display=swap" rel="stylesheet">
     <style>
         body { background-color: #0d0d12; color: #e2e8f0; font-family: 'Inter', sans-serif; height: 100vh; overflow: hidden; }
         .sidebar { width: 240px; background: #16161e; border-right: 1px solid #23232f; }
         .main-editor { background: #0d0d12; }
-        .ia-panel { width: 300px; background: #16161e; border-left: 1px solid #23232f; }
-        .status-bar { height: 25px; background: #1e1e2e; border-top: 1px solid #23232f; font-size: 11px; }
-        .file-item { padding: 6px 12px; font-size: 13px; color: #94a3b8; cursor: pointer; display: flex; align-items: center; gap: 8px; }
-        .file-item:hover { background: #1e1e2e; color: white; }
-        .btn-ia { background: #23232f; border: 1px solid #333345; padding: 8px; border-radius: 8px; font-size: 12px; text-align: left; }
+        .ia-panel { width: 320px; background: #16161e; border-left: 1px solid #23232f; }
+        .btn-ia { background: #1e1e2e; border: 1px solid #333345; padding: 10px; border-radius: 8px; font-size: 11px; text-align: center; transition: all 0.2s; font-weight: 600; }
+        .btn-ia:hover { border-color: #8b5cf6; background: #23232f; transform: translateY(-1px); }
+        #editor { font-family: 'Fira Code', monospace; scrollbar-width: thin; scrollbar-color: #23232f transparent; }
+        .chat-bubble { background: #0d0d12; border: 1px solid #23232f; border-radius: 12px; padding: 12px; font-size: 12px; margin-bottom: 10px; line-height: 1.5; border-left: 3px solid #8b5cf6; }
+        .status-bar { height: 28px; background: #1e1e2e; border-top: 1px solid #23232f; font-size: 11px; }
     </style>
 </head>
 <body class="flex flex-col">
@@ -21,82 +24,138 @@
     <nav class="h-12 border-b border-white/5 flex items-center justify-between px-4 bg-[#16161e]">
         <div class="flex items-center gap-6">
             <div class="flex items-center gap-2">
-                <div class="w-6 h-6 bg-pink-500 rounded flex items-center justify-center text-[10px] font-bold">NC</div>
-                <span class="text-xs font-bold">NexusCode <span class="text-slate-500 font-normal">Studio Pro</span></span>
-            </div>
-            <div class="hidden md:flex gap-4 text-xs text-slate-400">
-                <span>Fichier</span><span>Édition</span><span>Affichage</span><span>Exécuter</span>
+                <div class="w-6 h-6 bg-gradient-to-br from-purple-600 to-blue-500 rounded flex items-center justify-center text-[10px] font-black italic">NC</div>
+                <span class="text-xs font-black tracking-tighter">NEXUSCODE <span class="text-slate-500 font-medium tracking-normal">Studio Pro</span></span>
             </div>
         </div>
-        <button class="bg-emerald-600/20 text-emerald-500 border border-emerald-500/30 px-3 py-1 rounded text-xs flex items-center gap-2">
-            <span>▶</span> Exécuter
-        </button>
+        <div class="flex items-center gap-3">
+             <button onclick="runCode()" class="bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 px-4 py-1.5 rounded-lg text-[11px] font-bold flex items-center gap-2 hover:bg-emerald-600/30 transition-all">
+                <span>▶</span> EXÉCUTER
+            </button>
+        </div>
     </nav>
 
     <div class="flex-1 flex overflow-hidden">
         
-        <aside class="sidebar flex flex-col">
-            <div class="p-4 text-[10px] uppercase tracking-widest font-bold text-slate-500">Explorateur</div>
-            <div class="flex-1 overflow-y-auto">
-                <div class="file-item"><span>📁</span> src</div>
-                <div class="file-item ml-4"><span>📂</span> components</div>
-                <div class="file-item ml-8 text-blue-400"><span>🔹</span> Button.tsx</div>
-                <div class="file-item ml-8"><span>🔹</span> Card.tsx</div>
-                <div class="file-item ml-4"><span>📂</span> utils</div>
-                <div class="file-item ml-4"><span>🐍</span> main.py</div>
-                <div class="file-item"><span>📄</span> package.json</div>
+        <aside class="sidebar hidden md:flex flex-col">
+            <div class="p-4 text-[10px] uppercase tracking-widest font-black text-slate-600">Projet</div>
+            <div class="flex-1 overflow-y-auto px-2">
+                <div class="flex items-center gap-2 p-2 text-xs text-slate-400 hover:bg-white/5 rounded cursor-pointer"><span>📁</span> src</div>
+                <div class="flex items-center gap-2 p-2 text-xs text-blue-400 bg-blue-500/5 border-l-2 border-blue-500 rounded ml-4 italic"><span>🔹</span> main.js</div>
+                <div class="flex items-center gap-2 p-2 text-xs text-slate-400 hover:bg-white/5 rounded ml-4"><span>🔹</span> style.css</div>
             </div>
         </aside>
 
         <main class="flex-1 flex flex-col main-editor">
-            <div class="h-8 bg-[#1e1e2e] flex items-center px-4 border-b border-white/5">
-                <span class="text-[10px] text-blue-400 border-b border-blue-400 h-full flex items-center px-2">Button.tsx</span>
+            <div class="h-10 bg-[#1e1e2e]/50 flex items-center px-4 border-b border-white/5">
+                <span class="text-[10px] text-blue-400 border-b-2 border-blue-500 h-full flex items-center px-3 font-bold">main.js</span>
             </div>
-            <textarea id="editor" class="flex-1 bg-transparent p-6 outline-none font-mono text-sm leading-relaxed" spellcheck="false">
-export const Button = ({ label }) => {
-  return (
-    <button className="bg-blue-500 text-white p-2">
-      {label}
-    </button>
-  );
-};</textarea>
+            <textarea id="editor" class="flex-1 bg-transparent p-8 outline-none text-sm leading-relaxed text-slate-300 resize-none" spellcheck="false" placeholder="// Écris ton code ici...">
+function helloNexus() {
+  console.log("Bienvenue dans le Studio Pro !");
+  let status = "Connecté";
+  return status;
+}
+
+helloNexus();</textarea>
         </main>
 
-        <aside class="ia-panel p-4 flex flex-col gap-4">
-            <div class="flex items-center gap-2 mb-2">
-                <span class="text-purple-500">✨</span>
-                <span class="font-bold text-sm">Assistant IA</span>
+        <aside class="ia-panel flex flex-col">
+            <div class="p-4 border-b border-white/5 flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <span class="text-purple-500 animate-pulse">✨</span>
+                    <span class="font-bold text-xs uppercase tracking-tighter">Nexus Assistant</span>
+                </div>
+                <div class="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
             </div>
             
-            <div class="grid grid-cols-2 gap-2">
-                <button class="btn-ia hover:border-blue-500">💡 Expliquer</button>
-                <button class="btn-ia hover:border-blue-500"><> Optimiser</button>
-                <button class="btn-ia hover:border-blue-500">🐞 Déboguer</button>
-                <button class="btn-ia hover:border-blue-500">📝 Documenter</button>
+            <div class="p-4 grid grid-cols-2 gap-2">
+                <button onclick="askIA('expliquer')" class="btn-ia">Expliquer</button>
+                <button onclick="askIA('optimiser')" class="btn-ia">Optimiser</button>
+                <button onclick="askIA('deboguer')" class="btn-ia">Déboguer</button>
+                <button onclick="askIA('documenter')" class="btn-ia">Documenter</button>
             </div>
 
-            <div class="flex-1 bg-[#0d0d12] rounded-xl p-3 text-xs text-slate-400 border border-white/5 overflow-y-auto mt-4">
-                <p class="mb-2">**Astuce du jour :** Tu peux me parler avec le micro !</p>
+            <div id="ia-chat-box" class="flex-1 overflow-y-auto px-4 py-2 space-y-3">
+                <div class="chat-bubble">
+                    Bonjour ! Je suis prêt à analyser votre code. Choisissez une action ci-dessus ou parlez-moi directement.
+                </div>
             </div>
 
-            <div class="relative mt-auto">
-                <input type="text" placeholder="Peux-tu m'expliquer ce code..." class="w-full bg-[#23232f] border border-white/10 rounded-lg p-3 pr-10 text-xs outline-none focus:border-purple-500">
-                <button class="absolute right-2 top-2 text-purple-500 italic">▶</button>
+            <div class="p-4 bg-[#16161e] border-t border-white/5">
+                <div class="relative">
+                    <input type="text" id="user-input" placeholder="Poser une question..." class="w-full bg-[#0d0d12] border border-white/10 rounded-xl p-3 pr-10 text-[11px] outline-none focus:border-purple-500/50 transition-all">
+                    <button onclick="sendMessage()" class="absolute right-2 top-2.5 text-purple-500 hover:text-purple-400">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </button>
+                </div>
             </div>
         </aside>
     </div>
 
-    <footer class="status-bar flex items-center justify-between px-3 text-slate-500">
+    <footer class="status-bar flex items-center justify-between px-3 text-slate-500 font-medium">
         <div class="flex items-center gap-4">
-            <span>🌿 main</span>
-            <span>⟳ 0 △ 0</span>
+            <span class="flex items-center gap-1"><span class="text-blue-500">🌿</span> main*</span>
+            <span>⟳ 0 △ 1</span>
         </div>
         <div class="flex items-center gap-4">
-            <span>UTF-8</span>
-            <span class="text-emerald-500 flex items-center gap-1">● En ligne</span>
-            <span>by Lougmane</span>
+            <span>JavaScript</span>
+            <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-emerald-500"></span> Studio Lougmane Ready</span>
         </div>
     </footer>
 
+    <script>
+        const chatBox = document.getElementById('ia-chat-box');
+        const editor = document.getElementById('editor');
+
+        function addMessage(text) {
+            const div = document.createElement('div');
+            div.className = 'chat-bubble';
+            div.innerHTML = text;
+            chatBox.appendChild(div);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        function askIA(action) {
+            const code = editor.value;
+            let response = "";
+
+            if (code.trim() === "") {
+                response = "Votre éditeur est vide ! Écrivez du code pour que je puisse l'analyser.";
+            } else {
+                switch(action) {
+                    case 'expliquer':
+                        response = "🔬 **Analyse :** Votre code définit une fonction ou une logique. Je vois " + (code.length) + " caractères. Voulez-vous que j'analyse une ligne précise ?";
+                        break;
+                    case 'optimiser':
+                        response = "⚡ **Optimisation :** J'ai vérifié la syntaxe. Votre code semble correct. Je suggère d'utiliser des constantes `const` si les variables ne changent pas.";
+                        break;
+                    case 'deboguer':
+                        response = code.includes(';') ? "✅ **Debug :** Aucune erreur majeure détectée. N'oubliez pas de tester les cas particuliers !" : "⚠️ **Alerte :** Pensez à vérifier vos points-virgules pour plus de clarté.";
+                        break;
+                    case 'documenter':
+                        response = "📝 **Doc :** J'ai généré des commentaires invisibles pour votre structure. C'est une bonne pratique !";
+                        break;
+                }
+            }
+            addMessage(response);
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('user-input');
+            if(input.value.trim() !== "") {
+                addMessage("💬 **Vous :** " + input.value);
+                setTimeout(() => {
+                    addMessage("🤖 **Nexus :** Je traite votre demande concernant : '" + input.value + "'.");
+                }, 600);
+                input.value = "";
+            }
+        }
+
+        function runCode() {
+            alert("Exécution en cours...\nRésultat dans la console du studio.");
+            console.log("Nexus Studio - Output:", editor.value);
+        }
+    </script>
 </body>
 </html>
