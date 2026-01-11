@@ -2,114 +2,126 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NexusCode - Inscription & Secours</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>NexusCode v2.5 - Studio Final</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        .glass { background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(15px); }
-        body { background-color: #020617; color: white; font-family: 'Segoe UI', system-ui, sans-serif; overflow: hidden; }
-        .hidden-app { display: none; }
-        .input-nexus { background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255,255,255,0.1); border-radius: 14px; padding: 14px 18px; font-size: 14px; outline: none; transition: all 0.3s; width: 100%; color: white; }
-        .input-nexus:focus { border-color: #3b82f6; box-shadow: 0 0 15px rgba(59,130,246,0.15); }
+        .glass { background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(15px); }
+        body { background-color: #020617; color: white; font-family: 'Segoe UI', system-ui, sans-serif; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+        .hidden-app { display: none !important; }
+        #editor { font-family: 'Fira Code', monospace; -webkit-overflow-scrolling: touch; }
+        .input-nexus { background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 12px 16px; width: 100%; color: white; font-size: 16px; outline: none; }
+        .input-nexus:focus { border-color: #3b82f6; }
     </style>
 </head>
-<body class="h-screen flex flex-col">
+<body>
 
-    <div id="auth-screen" class="fixed inset-0 z-[100] flex items-center justify-center bg-[#020617]">
-        <div class="w-full max-w-md p-10 rounded-[2.5rem] border border-white/10 glass shadow-2xl">
-            <div class="text-center mb-10">
-                <img src="logo.png" alt="Nexus" class="h-16 w-16 mx-auto mb-4 rounded-2xl shadow-lg shadow-blue-500/20">
-                <h1 class="text-3xl font-black tracking-tighter uppercase">NEXUS<span class="text-blue-500">CODE</span></h1>
-                <p class="text-slate-400 text-[10px] mt-2 font-bold uppercase tracking-widest">Accès Développeur Gratuit</p>
-            </div>
+    <div id="auth-screen" class="fixed inset-0 z-[100] flex items-center justify-center bg-[#020617] p-4">
+        <div class="w-full max-w-md p-8 rounded-[2.5rem] border border-white/10 glass shadow-2xl text-center">
+            <img src="logo.png" alt="Nexus" id="main-logo" class="h-16 w-16 mx-auto mb-4 rounded-2xl shadow-lg shadow-blue-500/20">
+            <h1 class="text-2xl font-black tracking-tighter uppercase italic">NEXUS<span class="text-blue-500">CODE</span></h1>
+            <p class="text-slate-400 text-[10px] mb-8 font-bold uppercase tracking-widest">Studio Cloud Gratuit</p>
             
-            <div class="space-y-4">
+            <div class="space-y-3 text-left">
                 <input type="text" id="reg-name" placeholder="Nom complet" class="input-nexus">
-                <input type="email" id="reg-email" placeholder="Adresse E-mail" class="input-nexus">
+                <input type="email" id="reg-email" placeholder="E-mail" class="input-nexus">
                 <input type="password" id="reg-pass" placeholder="Mot de passe" class="input-nexus">
-                
-                <button onclick="handleSignup()" class="w-full bg-blue-600 hover:bg-blue-500 py-4 rounded-2xl font-bold text-sm shadow-xl shadow-blue-900/40 transition-all transform hover:scale-[1.02]">
+                <button onclick="handleSignup()" class="w-full bg-blue-600 hover:bg-blue-500 py-4 rounded-xl font-bold text-sm shadow-xl transition-all active:scale-95 mt-4">
                     Créer mon compte
                 </button>
-
-                <div class="text-center pt-2">
-                    <button onclick="resetAccount()" class="text-[10px] text-slate-500 hover:text-blue-400 underline underline-offset-4 transition-colors">
-                        Mot de passe oublié ou réinscription ?
-                    </button>
+                <div class="text-center mt-4">
+                    <button onclick="resetAccount()" class="text-[9px] text-slate-500 uppercase tracking-widest hover:text-blue-400 transition-colors">Réinscription / Oubli</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <div id="main-app" class="h-screen flex flex-col hidden-app">
-        <nav class="h-16 glass flex items-center justify-between px-8 border-b border-white/5 z-50">
-            <div class="flex items-center gap-4">
-                <img src="logo.png" alt="Logo" class="h-8 w-8 rounded-lg">
-                <span class="text-sm font-black tracking-tighter italic">NEXUS STUDIO</span>
+    <div id="main-app" class="flex-1 flex flex-col hidden-app">
+        <nav class="h-14 glass flex items-center justify-between px-4 sm:px-8 border-b border-white/5">
+            <div class="flex items-center gap-2">
+                <img src="logo.png" class="h-6 w-6 rounded">
+                <span class="text-xs font-black tracking-tighter uppercase">Nexus <span class="text-blue-500">Studio</span></span>
             </div>
             <div class="flex items-center gap-4">
-                <span id="user-email-display" class="text-[9px] text-blue-400 font-bold bg-blue-500/10 px-3 py-1 rounded-full border border-blue-500/20"></span>
-                <button onclick="logout()" class="text-slate-500 hover:text-red-400 transition-colors">Déconnexion</button>
+                <span id="user-display" class="hidden sm:block text-[10px] text-blue-400 font-bold bg-blue-500/10 px-3 py-1 rounded border border-blue-500/20"></span>
+                <button onclick="logout()" class="text-slate-500 hover:text-red-400"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg></button>
             </div>
         </nav>
 
-        <main class="flex-1 flex overflow-hidden">
-            <textarea id="editor" class="flex-1 bg-transparent p-12 text-lg outline-none resize-none font-mono text-slate-300 placeholder:text-slate-800" placeholder="Le code commence ici..."></textarea>
+        <main class="flex-1 relative overflow-hidden flex flex-col">
+            <textarea id="editor" class="flex-1 bg-transparent p-6 text-base outline-none resize-none text-slate-300 font-mono" placeholder="Écrivez votre code ici..."></textarea>
+            
+            <div id="companion-bubble" class="absolute bottom-6 right-6 left-6 sm:left-auto sm:w-72 glass p-4 rounded-xl border border-white/10 shadow-2xl translate-y-40 opacity-0 transition-all duration-500 z-50">
+                <div class="flex items-center gap-2 mb-1">
+                    <div class="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center text-[10px]">🤖</div>
+                    <span class="font-bold text-[9px] text-blue-400 uppercase">Nexus IA</span>
+                </div>
+                <p id="ia-message" class="text-[11px] text-slate-200 italic"></p>
+            </div>
         </main>
-
-        <div id="companion-bubble" class="fixed bottom-10 right-10 w-72 glass p-5 rounded-2xl border border-white/10 shadow-2xl translate-y-32 opacity-0 pointer-events-none transition-all duration-500">
-            <p id="ia-message" class="text-xs text-slate-200 italic"></p>
-        </div>
     </div>
 
     <script>
-        // FONCTION INSCRIPTION
+        const authScreen = document.getElementById('auth-screen');
+        const mainApp = document.getElementById('main-app');
+        const editor = document.getElementById('editor');
+        const bubble = document.getElementById('companion-bubble');
+        const iaMessage = document.getElementById('ia-message');
+
+        // Sécurité Logo : Si logo.png n'existe pas, on met un cercle bleu
+        document.getElementById('main-logo').onerror = function() {
+            this.src = "https://ui-avatars.com/api/?name=Nexus&background=3b82f6&color=fff";
+        };
+
         function handleSignup() {
             const name = document.getElementById('reg-name').value;
             const email = document.getElementById('reg-email').value;
             const pass = document.getElementById('reg-pass').value;
-
-            if (name && email.includes('@') && pass.length > 5) {
-                localStorage.setItem('nexus_user_data', JSON.stringify({name, email, pass}));
-                enterApp(name, email);
-            } else {
-                alert("Veuillez remplir les champs (E-mail valide + mot de passe 6 car. min)");
-            }
+            if (name.length > 2 && email.includes('@') && pass.length > 5) {
+                const data = { name, email };
+                localStorage.setItem('nexus_user_data', JSON.stringify(data));
+                enterApp(data);
+            } else { alert("Veuillez remplir tous les champs (E-mail valide + Pass 6 car. min)"); }
         }
 
-        // FONCTION RÉINITIALISATION (POUR OUBLI)
+        function enterApp(data) {
+            authScreen.classList.add('hidden-app');
+            mainApp.classList.remove('hidden-app');
+            document.getElementById('user-display').innerText = data.email.toUpperCase();
+            showIA(`Identification réussie. Bienvenue, <b>${data.name}</b>.`);
+        }
+
+        function showIA(text) {
+            iaMessage.innerHTML = text;
+            bubble.classList.remove('translate-y-40', 'opacity-0');
+            setTimeout(() => bubble.classList.add('translate-y-40', 'opacity-0'), 5000);
+        }
+
         function resetAccount() {
-            if(confirm("Voulez-vous supprimer le compte actuel et en créer un nouveau ?")) {
-                localStorage.removeItem('nexus_user_data');
+            if(confirm("Supprimer le compte pour en créer un nouveau ?")) {
+                localStorage.clear();
                 location.reload();
             }
         }
 
-        function enterApp(name, email) {
-            document.getElementById('auth-screen').style.display = 'none';
-            document.getElementById('main-app').classList.remove('hidden-app');
-            document.getElementById('user-email-display').innerText = email.toUpperCase();
-            showIA(`Compte actif. Bienvenue dans votre studio, <b>${name}</b>.`);
-        }
+        function logout() { location.reload(); }
 
-        function showIA(text) {
-            const bubble = document.getElementById('companion-bubble');
-            document.getElementById('ia-message').innerHTML = text;
-            bubble.classList.remove('translate-y-32', 'opacity-0');
-            setTimeout(() => { bubble.classList.add('translate-y-32', 'opacity-0'); }, 5000);
-        }
-
-        function logout() {
-            location.reload(); 
-        }
-
+        // Système de sauvegarde automatique
         window.onload = () => {
-            const savedData = localStorage.getItem('nexus_user_data');
-            if (savedData) {
-                const user = JSON.parse(savedData);
-                enterApp(user.name, user.email);
-            }
+            const saved = localStorage.getItem('nexus_user_data');
+            if (saved) enterApp(JSON.parse(saved));
+            
+            const draft = localStorage.getItem('nexus_draft');
+            if (draft) editor.value = draft;
         };
+
+        editor.addEventListener('input', () => {
+            localStorage.setItem('nexus_draft', editor.value);
+            // IA : Détecte les balises non fermées
+            if (editor.value.includes('<div') && !editor.value.includes('</div>')) {
+                showIA("Note : N'oubliez pas de fermer votre balise &lt;div&gt;.");
+            }
+        });
     </script>
 </body>
 </html>
